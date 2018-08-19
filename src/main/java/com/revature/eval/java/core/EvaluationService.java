@@ -3,8 +3,15 @@ package com.revature.eval.java.core;
 //small change
 
 import java.time.temporal.Temporal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EvaluationService {
 
@@ -16,8 +23,29 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String reverse(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+		
+		// check base cases
+		if (string.equals(null) || string.length() == 0 || string.length() == 1) {
+			return string;
+		}
+		
+		char[] input = string.toCharArray();
+		
+		int start = 0;					// first index
+		int end = string.length()-1;	// last index
+		
+		while (start < end) {
+			// swapping
+			char temp = input[start];
+			input[start] = input[end];
+			input[end] = temp;
+			
+			start++; // advance pointers...
+			end--;
+		} // end while
+		
+		return new String(input);
 	}
 
 	/**
@@ -29,8 +57,32 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String acronym(String phrase) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+		
+		phrase = phrase.trim(); // get rid of leading/trailing whitespace
+		
+		// base cases
+		if (phrase.equals(null) || phrase.length() == 0 || phrase.length() == 1) {
+			return phrase;
+		}
+
+		// now assuming the phrase is at least 2 characters
+
+		ArrayList<String> result = new ArrayList<String>(); // using ArrayList because don't know length of acronym yet
+
+		String[] input = phrase.split("\\W+"); // returns array of Strings by dividing at spaces
+		for(String word : input) {
+			result.add(word.substring(0, 1)); // charAt returns char, a primitive type. ArrayList cannot hold primitives
+		}
+
+		String acron = "";
+		int i = 0;
+		while (i < result.size()) {
+			acron += result.get(i);
+			i++;
+		}
+		
+		return acron.toUpperCase();
 	}
 
 	/**
@@ -83,18 +135,42 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			// Write an implementation for this method declaration	
+			boolean isEq = false;
+			
+			if (sideOne == sideTwo && sideTwo == sideThree) {
+				isEq = true;
+			}
+			else {
+				isEq = false;
+			}
+			return isEq;
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			// Write an implementation for this method declaration
+			boolean isIso = false;
+			
+			if (sideOne == sideTwo || sideOne == sideThree || sideTwo == sideThree) {
+				isIso = true;
+			}
+			else {
+				isIso = false;
+			}		
+			return isIso;
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			// Write an implementation for this method declaration		
+			boolean isScal = true;
+			
+			if (sideOne == sideTwo || sideOne == sideThree || sideTwo == sideThree) {
+				isScal = false;
+			}
+			else {
+				isScal = true;
+			}		
+			return isScal;
 		}
 
 	}
@@ -102,8 +178,14 @@ public class EvaluationService {
 	/**
 	 * 4. Given a word, compute the scrabble score for that word.
 	 * 
-	 * --Letter Values-- Letter Value A, E, I, O, U, L, N, R, S, T = 1; D, G = 2; B,
-	 * C, M, P = 3; F, H, V, W, Y = 4; K = 5; J, X = 8; Q, Z = 10; Examples
+	 * --Letter Values-- Letter Value
+	 * A, E, I, O, U, L, N, R, S, T = 1;
+	 * D, G = 2; 
+	 * B, C, M, P = 3; 
+	 * F, H, V, W, Y = 4; 
+	 * K = 5; 
+	 * J, X = 8; 
+	 * Q, Z = 10; Examples
 	 * "cabbage" should be scored as worth 14 points:
 	 * 
 	 * 3 points for C, 1 point for A, twice 3 points for B, twice 2 points for G, 1
@@ -115,8 +197,60 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		// Write an implementation for this method declaration
+		
+		// convert to lowercase to make easier
+		
+		string = string.toLowerCase();
+		
+		// Use HashMap
+		
+		HashMap<Character, Integer> hmap = new HashMap<Character, Integer>(); // declare HashMap
+		
+		// add elements to HashMap
+		
+		hmap.put('a', 1);
+		hmap.put('e', 1);
+		hmap.put('i', 1);
+		hmap.put('o', 1);
+		hmap.put('u', 1);
+		hmap.put('l', 1);
+		hmap.put('n', 1);
+		hmap.put('r', 1);
+		hmap.put('s', 1);
+		hmap.put('t', 1);
+		
+		hmap.put('d', 2);
+		hmap.put('g', 2);
+		
+		hmap.put('b', 3);
+		hmap.put('c', 3);
+		hmap.put('m', 3);
+		hmap.put('p', 3);
+		
+		hmap.put('f', 4);
+		hmap.put('h', 4);
+		hmap.put('v', 4);
+		hmap.put('w', 4);
+		hmap.put('y', 4);
+		
+		hmap.put('k', 5);
+		
+		hmap.put('j', 8);
+		hmap.put('x', 8);
+		
+		hmap.put('q', 10);
+		hmap.put('z', 10);
+		
+		// compute score
+		
+		int score = 0;
+
+		for(char letter : string.toCharArray()) {
+			score += hmap.get(letter);
+		}
+		
+		return score;
 	}
 
 	/**
@@ -151,22 +285,91 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+		string = string.trim(); // get rid of leading/trailing whitespace
+
+		// base cases
+		if (string.equals(null) || string.length() == 0 || string.length() == 1) {
+			throw new IllegalArgumentException();
+		}
+
+		// check for certain characters in string
+		// I am matching any character in ASCII chart from '<colon>' to '<squiggly'and '<exclamation>' to '<apostrophe>' and more
+		// I am NOT checking for dashes, periods, parenthesis, or plus signs since those are reasonable. I filter that later
+		String pattern = "[*,/:-~!-']+"; 
+
+		// create Pattern object
+		Pattern r = Pattern.compile(pattern);
+
+		//create matcher object
+		Matcher m = r.matcher(string);
+		
+		// exception
+		if (m.find()) {
+			throw new IllegalArgumentException();
+		}
+
+		// now assuming the phrase is at least 2 characters
+
+		ArrayList<String> result = new ArrayList<String>(); // using ArrayList because don't know length of # yet
+
+		String[] input = string.split("\\W+"); // returns array of Strings by dividing at spaces
+
+		for(String digit : input) {
+			result.add(digit);
+		}
+
+		String cleanNum = "";
+		int i = 0;
+		while (i < result.size()) {
+			cleanNum += result.get(i);
+			i++;
+		}
+
+		// make sure to get rid of 1s
+		if (cleanNum.charAt(0) == '1' && cleanNum.length() > 10) {
+			cleanNum = cleanNum.substring(1,11);
+		}
+
+		// exception
+		if (cleanNum.length() >= 12) { // number too long
+			throw new IllegalArgumentException();
+		}
+		
+		return cleanNum;
 	}
 
 	/**
 	 * 6. Given a phrase, count the occurrences of each word in that phrase.
 	 * 
-	 * For example for the input "olly olly in come free" olly: 2 in: 1 come: 1
+	 * For example for the input "olly olly in come free" 
+	 * olly: 2 
+	 * in: 1 
+	 * come: 1
 	 * free: 1
 	 * 
 	 * @param string
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+		
+		string = string.trim();
+		
+		Map<String, Integer> freqMap = new HashMap<String, Integer>(); // declare HashMap
+		
+		//split word @ spaces
+		String[] wordsArray = string.split("\\W+"); // returns array of Strings by dividing at spaces
+		for(String word : wordsArray) { // for each word in wordsArray
+			if (freqMap.containsKey(word)) {
+				freqMap.put(word, freqMap.get(word)+1); // if map contains word, increment value
+			}
+			else {
+				freqMap.put(word, 1); // if map doesn't contain word, add it and we know value is 1
+			}
+		}
+		
+		return freqMap;
 	}
 
 	/**
@@ -204,13 +407,34 @@ public class EvaluationService {
 	 * binary search is a dichotomic divide and conquer search algorithm.
 	 * 
 	 */
-	static class BinarySearch<T> {
+	static class BinarySearch<T extends Comparable> { // time efficiency: O(log n)
 		private List<T> sortedList;
 
 		public int indexOf(T t) {
-			// TODO Write an implementation for this method declaration
+			// Write an implementation for this method declaration
+			if (binarySearch(0, sortedList.size(), t)) { // use helper method
+				return sortedList.indexOf(t);
+			}
 			return 0;
 		}
+
+		private boolean binarySearch(int first, int last, T desiredItem) {
+			boolean found;
+			int mid = first + (last - first) / 2; // computation of midpoint
+			if (first > last) {
+				found = false; // no elements to search
+			}
+			else if (desiredItem.equals(sortedList.get(mid))) {
+				found = true;
+			}
+			else if (desiredItem.compareTo(sortedList.get(mid)) < 0) {
+				found = binarySearch(first, mid-1, desiredItem); // check left half
+			}
+			else {
+				found = binarySearch(mid+1, last, desiredItem); // check right half
+			}
+			return found;
+		} // end binarySearch
 
 		public BinarySearch(List<T> sortedList) {
 			super();
@@ -235,7 +459,8 @@ public class EvaluationService {
 	 * difficult for non-children (and non-native speakers) to understand.
 	 * 
 	 * Rule 1: If a word begins with a vowel sound, add an "ay" sound to the end of
-	 * the word. Rule 2: If a word begins with a consonant sound, move it to the end
+	 * the word.
+	 * Rule 2: If a word begins with a consonant sound, move it to the end
 	 * of the word, and then add an "ay" sound to the end of the word. There are a
 	 * few more rules for edge cases, and there are regional variants too.
 	 * 
@@ -245,8 +470,75 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+		string = string.trim(); // get rid of leading/trailing whitespace
+		
+		String newString = "";
+	
+		ArrayList<String> vowels = new ArrayList<String>(); // has contains method
+		vowels.add("a");
+		vowels.add("e");
+		vowels.add("i");
+		vowels.add("o");
+		vowels.add("u");
+
+		ArrayList<String> consonants = new ArrayList<String>();
+		consonants.add("b");
+		consonants.add("c");
+		consonants.add("d");
+		consonants.add("f");
+		consonants.add("g");
+		consonants.add("h");
+		consonants.add("j");
+		consonants.add("k");
+		consonants.add("l");
+		consonants.add("m");
+		consonants.add("n");
+		consonants.add("p");
+		consonants.add("q");
+		consonants.add("r");
+		consonants.add("s");
+		consonants.add("t");
+		consonants.add("v");
+		consonants.add("w");
+		consonants.add("x");
+		consonants.add("y");
+		consonants.add("z");
+
+		//split word @ spaces to account for entire phrases
+		String[] wordsArray = string.split("\\W+"); // returns array of Strings by dividing at spaces
+
+		for(String word : wordsArray) {
+
+			// if word begins with single-letter vowel
+			if (vowels.contains(word.substring(0,1))) {	
+				newString += word + "ay ";
+			}
+
+			// if word begins with multi-letter consonant sound; this is checked before single letter
+			else if (word.substring(0,3).equals("sch") || word.substring(0,3).equals("str")) {
+				newString += word.substring(3) + word.substring(0, 3) + "ay ";	
+			}
+			
+			else if (word.substring(0,2).equals("qu") || word.substring(0,2).equals("th") 
+					|| word.substring(0,2).equals("sm") || word.substring(0,2).equals("fl") 
+					|| word.substring(0,2).equals("st") || word.substring(0,2).equals("tr") 
+					|| word.substring(0,2).equals("gl")) {
+				newString += word.substring(2) + word.substring(0, 2) + "ay ";	
+			}
+			
+			//if word begins with multi-letter vowel sound
+			else if (word.substring(0,2).equals("ho")) {
+				newString += word + "ay ";
+			}
+
+			// if word begins with single-letter consonant
+			else if (consonants.contains(word.substring(0, 1))) {
+				newString += word.substring(1) + word.substring(0, 1) + "ay ";
+			}
+		}
+
+		return newString.trim();
 	}
 
 	/**
@@ -255,18 +547,51 @@ public class EvaluationService {
 	 * 
 	 * For example:
 	 * 
-	 * 9 is an Armstrong number, because 9 = 9^1 = 9 10 is not an Armstrong number,
-	 * because 10 != 1^2 + 0^2 = 2 153 is an Armstrong number, because: 153 = 1^3 +
-	 * 5^3 + 3^3 = 1 + 125 + 27 = 153 154 is not an Armstrong number, because: 154
-	 * != 1^3 + 5^3 + 4^3 = 1 + 125 + 64 = 190 Write some code to determine whether
-	 * a number is an Armstrong number.
+	 * 9 is an Armstrong number, because 9 = 9^1 = 9 
+	 * 10 is not an Armstrong number, because 10 != 1^2 + 0^2 = 2 
+	 * 153 is an Armstrong number, because: 153 = 1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153 
+	 * 154 is not an Armstrong number, because: 154 != 1^3 + 5^3 + 4^3 = 1 + 125 + 64 = 190 
+	 * Write some code to determine whether a number is an Armstrong number.
 	 * 
 	 * @param input
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		// Write an implementation for this method declaration
+
+		// no negative numbers allowed
+		if (input < 0) {
+			return false;
+		}
+		
+		int num = input;
+		int sum = 0;
+		int rightmostDigit = num%10;
+
+		// when input is a single digit
+		if ((num/10) < 1) {
+			return true;
+		}
+
+		ArrayList<Integer> storeDigits = new ArrayList<Integer>();
+
+		int count = -1;
+
+		// when input is 2 or more digits long
+		while (rightmostDigit != num) {
+			rightmostDigit = num%10;
+			num = (num - rightmostDigit)/10;
+
+			// keep this rightmostDigit
+			storeDigits.add(rightmostDigit);
+			count++;
+		}
+
+		for (int digit : storeDigits) {
+			sum += Math.pow(digit, count);
+		}
+
+		return input==sum;
 	}
 
 	/**
@@ -280,8 +605,53 @@ public class EvaluationService {
 	 * @return
 	 */
 	public List<Long> calculatePrimeFactorsOf(long l) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		// Write an implementation for this method declaration
+
+		long num = l;
+
+		List<Long> listOfPrimeFactors = new ArrayList<Long>();
+
+		// use helper method isPrime to check accuracy of prime #s
+		
+		// check up to sqrt of num because checking if num has 2 factors
+		for (long i = 2; i <= Math.sqrt(num); i++) {
+			while (num%i==0) {
+				num = num/i;
+				if (isPrime(i)) {
+					listOfPrimeFactors.add(i);
+				}
+			}
+		}
+		if (num > 1) {
+			if (isPrime(num)) {
+				listOfPrimeFactors.add(num);
+			}
+		}
+
+		return listOfPrimeFactors;
+	}
+
+	private boolean isPrime(long n) {
+		// 1 is not prime
+		if (n == 1) {
+			return false;
+		}
+
+		// 2 is only even prime number
+		if (n == 2) {
+			return true;
+		}
+		// if even, not prime (other than 2, which is checked)
+		if (n%2==0) {
+			return false;
+		}
+		// check odds only by starting @ 3 and traversing by 2s until square root of n
+		for(int i=3;i<=Math.sqrt(n);i+=2) {
+			if(n%i==0) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -298,17 +668,20 @@ public class EvaluationService {
 	 * 
 	 * A ROT13 on the Latin alphabet would be as follows:
 	 * 
-	 * Plain: abcdefghijklmnopqrstuvwxyz Cipher: nopqrstuvwxyzabcdefghijklm It is
-	 * stronger than the Atbash cipher because it has 27 possible keys, and 25
+	 * Plain: abcdefghijklmnopqrstuvwxyz 
+	 * Cipher: nopqrstuvwxyzabcdefghijklm 
+	 * It is stronger than the Atbash cipher because it has 27 possible keys, and 25
 	 * usable keys.
 	 * 
 	 * Ciphertext is written out in the same formatting as the input including
 	 * spaces and punctuation.
 	 * 
-	 * Examples: ROT5 omg gives trl ROT0 c gives c ROT26 Cool gives Cool ROT13 The
-	 * quick brown fox jumps over the lazy dog. gives Gur dhvpx oebja sbk whzcf bire
-	 * gur ynml qbt. ROT13 Gur dhvpx oebja sbk whzcf bire gur ynml qbt. gives The
-	 * quick brown fox jumps over the lazy dog.
+	 * Examples: 
+	 * ROT5 omg gives trl 
+	 * ROT0 c gives c 
+	 * ROT26 Cool gives Cool 
+	 * ROT13 The quick brown fox jumps over the lazy dog. gives Gur dhvpx oebja sbk whzcf bire gur ynml qbt. 
+	 * ROT13 Gur dhvpx oebja sbk whzcf bire gur ynml qbt. gives The quick brown fox jumps over the lazy dog.
 	 */
 	static class RotationalCipher {
 		private int key;
@@ -319,9 +692,79 @@ public class EvaluationService {
 		}
 
 		public String rotate(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			// Write an implementation for this method declaration
+			
+			// base cases
+			if (key == 0 || key == 26) {
+				return string;
+			}
+
+			char[] input = string.trim().toCharArray();
+
+			char[] alphabetArray = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ".toCharArray();
+			char[] rotatedArray = "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ".toCharArray();
+
+			// rotate alphabet first (normalAlphabet will be keys)		
+			rotatedArray = rotate(rotatedArray, key*2); // because capitals added in
+
+			//then encode
+			HashMap<Character, Character> alphMap = new HashMap<Character, Character>();
+			
+			// add letters to HashMap
+			for (int i=0; i < 52; i++) {
+			alphMap.put(alphabetArray[i], rotatedArray[i]);
+			}
+			
+			String num = "";
+			// add numbers to HashMap
+			for (int i=0; i<10; i++) {
+				num += Integer.toString(i);
+				alphMap.put(num.charAt(i), num.charAt(i));
+			}
+			
+			// add punctuation to HashMap
+			alphMap.put(' ', ' '); //space
+			alphMap.put(',', ','); //comma
+			alphMap.put('.', '.');
+			alphMap.put('-', '-');
+			alphMap.put('\'', '\'');//apostrophe
+			alphMap.put(' ', ' ');
+			alphMap.put('!', '!');
+			
+			String finalString = "";
+			
+			for (char letterOrPunctuation : input) { // for each char in the input string
+				finalString += alphMap.get(letterOrPunctuation);
+			}// end for each
+
+			return finalString;
 		}
+
+		// rotating helper method
+		private char[] rotate(char[] letters, int k) {
+
+			if(letters == null || letters.length < 2){
+				return letters;
+			}
+
+			k = k % letters.length;
+			reverse(letters, 0, letters.length - 1); // first reverse entire array
+			reverse(letters, letters.length - k, letters.length - 1); // then reverse last half
+			reverse(letters, 0, letters.length - k - 1); // then reverse 1st half
+			
+			return letters;
+		} // end rotate method
+
+		// swapping helper method
+		private void reverse(char[] letters, int i, int j){    
+			while(i < j){
+				char temp = letters[i];
+				letters[i] = letters[j];
+				letters[j] = temp;
+				i++; // advance pointers
+				j--;
+			}
+		} // end reverse method
 
 	}
 
@@ -338,8 +781,30 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int calculateNthPrime(int i) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		// Write an implementation for this method declaration
+
+		List<Integer> listOfPrimes = new ArrayList<Integer>();
+		
+		if (i == 0) {
+			throw new IllegalArgumentException("Cannot check 0th prime");
+		}
+		
+		if (i == 1) {
+			return 2;
+		}
+		
+		int j = 3;
+		
+		// use helper method isPrime I wrote for #10
+		while(listOfPrimes.size() < i) {
+			if (isPrime(j)) {
+				listOfPrimes.add(j);
+			}
+			j+=2; // increment by twos because primes are odd except 2
+		}
+
+		return listOfPrimes.get(i-2);
+		//return 0;
 	}
 
 	/**
@@ -362,8 +827,10 @@ public class EvaluationService {
 	 * size being 5 letters, and punctuation is excluded. This is to make it harder
 	 * to guess things based on word boundaries.
 	 * 
-	 * Examples Encoding test gives gvhg Decoding gvhg gives test Decoding gsvjf
-	 * rxpyi ldmul cqfnk hlevi gsvoz abwlt gives thequickbrownfoxjumpsoverthelazydog
+	 * Examples:
+	 * Encoding "test" gives "gvhg"
+	 * Decoding "gvhg" gives "test" 
+	 * Decoding "gsvjf rxpyi ldmul cqfnk hlevi gsvoz abwlt" gives "thequickbrownfoxjumpsoverthelazydog"
 	 *
 	 */
 	static class AtbashCipher {
@@ -375,8 +842,34 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String encode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			// Write an implementation for this method declaration
+			string = string.trim().toLowerCase();
+
+			String[] wordsArray = string.split("\\W+"); // array of words
+
+			ArrayList<String> newStringArrayList = new ArrayList<String>();
+
+			for (String word : wordsArray) { // for each word...
+				for(int i=0; i<word.length(); i++) { // iterate through each letter of that word...
+					newStringArrayList.add(alphabetMap().get(word.substring(i, i+1)));
+				}// end encode each letter
+			}// end for each
+
+			if (newStringArrayList.size() > 5) {
+				// add spaces after 5 letters
+				for (int index = 5; index < newStringArrayList.size(); index+=6) {
+					if (!newStringArrayList.get(index).equals(null)) {
+						newStringArrayList.add(index, " ");
+					}
+				}
+			}
+
+			String finalString = "";
+			for (String letter : newStringArrayList) {
+				finalString += letter;
+			}
+
+			return finalString;
 		}
 
 		/**
@@ -386,8 +879,93 @@ public class EvaluationService {
 		 * @return
 		 */
 		public static String decode(String string) {
-			// TODO Write an implementation for this method declaration
-			return null;
+			// Write an implementation for this method declaration
+			string = string.trim().toLowerCase();
+
+			ArrayList<String> listOfLetters = new ArrayList<String>();
+
+			for (int i=0; i < string.length(); i++) {
+				if (!string.substring(i,i+1).equals(" ")) {
+					listOfLetters.add(string.substring(i, i+1));
+				}
+			}
+
+			String decodedResult = "";
+
+			for (String letter : listOfLetters) { // for each word...
+				//System.out.println("letter is: " + word.substring(i, i+1));
+				decodedResult += (alphabetMapForDecode().get(letter)); // use second map from helper method
+			}// end for each
+
+			return decodedResult;
+		}
+
+		private static HashMap<String, String> alphabetMap() {			
+			String normalAlphabetString = "a b c d e f g h i j k l m n o p q r s t u v w x y z";
+			String[] normalAlphabetArray = normalAlphabetString.split("\\W+");
+			String[] reverseAlphabetArray = normalAlphabetString.split("\\W+");
+			
+			int start = 0; // first index
+			int end = reverseAlphabetArray.length-1; // last index
+			
+			while (start < end) {
+				// swapping
+				String temp = reverseAlphabetArray[start];
+				reverseAlphabetArray[start] = reverseAlphabetArray[end];
+				reverseAlphabetArray[end] = temp;
+				
+				start++; // advance pointers...
+				end--;
+			} // end while
+			
+			// Use HashMap
+			HashMap<String, String> alphMap = new HashMap<String, String>();
+			
+			// add letters to HashMap
+			for (int i=0; i < 26; i++) {
+			alphMap.put(normalAlphabetArray[i], reverseAlphabetArray[i]);
+			}
+			
+			// add numbers to HashMap
+			for (int i=0; i<10; i++) {
+				alphMap.put(Integer.toString(i), Integer.toString(i));
+			}
+			
+			return alphMap;
+		}
+		
+		private static HashMap<String, String> alphabetMapForDecode() {			
+			String normalAlphabetString = "a b c d e f g h i j k l m n o p q r s t u v w x y z";
+			String[] normalAlphabetArray = normalAlphabetString.split("\\W+");
+			String[] reverseAlphabetArray = normalAlphabetString.split("\\W+");
+			
+			int start = 0; // first index
+			int end = reverseAlphabetArray.length-1; // last index
+			
+			while (start < end) {
+				// swapping
+				String temp = reverseAlphabetArray[start];
+				reverseAlphabetArray[start] = reverseAlphabetArray[end];
+				reverseAlphabetArray[end] = temp;
+				
+				start++; // advance pointers...
+				end--;
+			} // end while
+			
+			// Use HashMap
+			HashMap<String, String> alphMap = new HashMap<String, String>();
+			
+			// add letters to HashMap
+			for (int i=0; i < 26; i++) { // just opposite order of other hashmap
+			alphMap.put(reverseAlphabetArray[i], normalAlphabetArray[i]);
+			}
+			
+			// add numbers to HashMap
+			for (int i=0; i<10; i++) {
+				alphMap.put(Integer.toString(i), Integer.toString(i));
+			}
+			
+			return alphMap;
 		}
 	}
 
@@ -414,8 +992,67 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isValidIsbn(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		// Write an implementation for this method declaration
+		System.out.println();
+		string = string.trim().toLowerCase();
+		String input = string.substring(0);
+		boolean isValid = false;
+		
+		// turn last character x into a String digit if not already
+		if (string.substring(string.length()-1, string.length()).equals("x")) {
+			input = input.replace("x", "10");
+		}
+		
+		// split this string at delimiters
+		String[] inputArray = input.split("-");
+
+		// check for any non-digits
+		String pattern = "[a-z]+";
+
+		// create Pattern object
+		Pattern r = Pattern.compile(pattern);
+
+		// create matcher object
+		Matcher m = r.matcher(input);
+
+		ArrayList<Integer> listOfNums = new ArrayList<Integer>();
+
+		// work element by element, if there's a non-digit character at this point, it's a mistake
+		for (String number : inputArray) {
+			for(int i=0; i<number.length(); i++) { 
+				if (m.find()) {
+					return false;
+				}
+				listOfNums.add(Integer.parseInt(number.substring(i, i+1)));
+			}// end encode each letter
+		}// end for each
+
+		int sum = 0;
+		int index = 0;
+
+		// if that original contained "x" multiply a different way
+		if (string.contains("x")) {
+			for (int i = 10; i >= 2; i--) {
+				sum += (listOfNums.get(index) * i);
+				index++;
+			}
+			sum += 10 * 1;
+		}
+		else {
+			for (int i = 10; i >= 1; i--) {
+				sum += (listOfNums.get(index) * i);
+				index++;
+			}
+		}
+		
+		if (sum%11 == 0) {
+			isValid = true;
+		}
+		else {
+			isValid = false;
+		}
+
+		return isValid;
 	}
 
 	/**
@@ -433,6 +1070,8 @@ public class EvaluationService {
 	 */
 	public boolean isPangram(String string) {
 		// TODO Write an implementation for this method declaration
+		
+		
 		return false;
 	}
 
@@ -446,6 +1085,10 @@ public class EvaluationService {
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
 		// TODO Write an implementation for this method declaration
+		
+		System.out.println(given);
+		
+		
 		return null;
 	}
 
@@ -537,6 +1180,13 @@ public class EvaluationService {
 	 */
 	public int solveWordProblem(String string) {
 		// TODO Write an implementation for this method declaration
+		
+		//use switch and cases
+//		case plus
+//		case minus
+//		case multiplied
+//		case divided
+		
 		return 0;
 	}
 
