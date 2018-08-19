@@ -1077,12 +1077,12 @@ public class EvaluationService {
 			return false;
 		}
 
-		// Create set (unordered collection that does not allow duplicates)
+		// Create HashSet (unordered collection that does not allow duplicates)
 		Set<Character> alphabet = new HashSet<>();
 
 		// must loop through at least 26 times
-		for (char ch = 'a'; ch <= 'z'; ch++) {
-			alphabet.add(ch);
+		for (char letter = 'a'; letter <= 'z'; letter++) {
+			alphabet.add(letter);
 		}
 
 		// keep removing letters we encounter in input string
