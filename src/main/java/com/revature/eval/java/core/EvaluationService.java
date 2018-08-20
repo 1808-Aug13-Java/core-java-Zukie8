@@ -1,6 +1,14 @@
 package com.revature.eval.java.core;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,7 +65,6 @@ public class EvaluationService {
 	 */
 	public String acronym(String phrase) {
 		// Write an implementation for this method declaration
-
 		phrase = phrase.trim(); // get rid of leading/trailing whitespace
 
 		// base cases
@@ -1078,6 +1085,7 @@ public class EvaluationService {
 		}
 
 		// Create HashSet (unordered collection that does not allow duplicates)
+		// note: when you add a duplicate to a set, the duplicate is ignored, and the set remains unchanged
 		Set<Character> alphabet = new HashSet<>();
 
 		// must loop through at least 26 times
@@ -1109,12 +1117,16 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Temporal getGigasecondDate(Temporal given) {
-		// TODO Write an implementation for this method declaration
-
-		//System.out.println(given);
-
-
-		return null;
+		// Write an implementation for this method declaration
+		Temporal result = given;
+		if (given instanceof LocalDateTime) {
+			result = ((LocalDateTime) given).plus((long) (1000000000), ChronoUnit.SECONDS);
+		}
+		if (given instanceof LocalDate) {
+			// atStartOfDay method returns LocalDateTime, then I still add the seconds
+			result = ((LocalDate) given).atStartOfDay().plus((long) (1000000000), ChronoUnit.SECONDS);
+		}
+		return result;
 	}
 
 	/**
@@ -1131,8 +1143,26 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getSumOfMultiples(int i, int[] set) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		// Write an implementation for this method declaration
+		int sum = 0;
+		
+		// there cannot be duplicates of the multiples, so use set
+		HashSet<Integer> multipleSet = new HashSet<Integer>();
+		
+		for(int givenNum : set) { // for each given num in set
+			for (int number = i-1; number > 0; number--) {
+				if (number%givenNum == 0) {
+					multipleSet.add(number);
+				}
+			}
+		}
+
+		// add everything together in the set
+		for (int multiple : multipleSet) {
+			sum += multiple;
+		}
+		
+		return sum;
 	}
 
 	/**
@@ -1172,8 +1202,63 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isLuhnValid(String string) {
-		// TODO Write an implementation for this method declaration
-		return false;
+		// TODO Write an implementation for this method declaration	
+		boolean isValid = true;
+		
+		if (string.matches("[0-9\\s]+")) {
+			isValid = true;
+		}
+		else {
+			return false;
+		}
+	
+		// Validating a Number Strings of length 1 or less are not valid
+		if (string.length() <= 1) {
+			isValid = false;
+		}
+		
+		System.out.println("string:  " + string);
+
+		
+		ArrayList<Integer> numberList = new ArrayList<Integer>();
+
+		String[] newString = string.split("[!-/:-~ ]+");
+
+		for (String thing : newString) {
+			for (int i=0; i<thing.length(); i++) {
+				numberList.add(Integer.parseInt(thing.substring(i, i+1)));
+			}
+		}
+
+		System.out.println("integer input:  " + numberList);
+
+		// double every other digit
+		for (int i=numberList.size()-2; i>=0; i-=2) {
+			if ((numberList.get(i))*2 > 9) {
+				numberList.set(i, ((numberList.get(i)*2) - 9) );
+			}
+			else {
+				numberList.set(i, (numberList.get(i)*2));
+			}
+		}
+		
+		int sum = 0;
+		for (int num : numberList) {
+			sum += num;
+		}
+		
+		if (sum%10 == 0) {
+			isValid = true;
+		}
+		else {
+			isValid = false;
+		}
+		
+		//System.out.println("sum:  " + sum);
+
+		//System.out.println("integer input:  " + numberList);
+
+		return isValid;
 	}
 
 	/**
@@ -1204,15 +1289,75 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int solveWordProblem(String string) {
-		// TODO Write an implementation for this method declaration
+		// Write an implementation for this method declaration
+		String operation = parseForOperation(string);
+		
+		ArrayList<Integer> nums;
 
-		//use switch and cases
-		//		case plus
-		//		case minus
-		//		case multiplied
-		//		case divided
+		int result = 0;
+		
+		switch(operation) {
+		case "plus":
+			//get and add variables
+			nums = parseForNums(string);
+			result = nums.get(0)+nums.get(1);
+			break;
+		case "minus":
+			//get and subtract variables
+			nums = parseForNums(string);
+			result = nums.get(0)-nums.get(1);
+			break;
+		case "divided":
+			//get and divide variables
+			nums = parseForNums(string);
+			while (nums.get(0)==0) {
+				System.out.println("Cannot divide by 0, please enter valid operands.");
+				nums = parseForNums(string);
+			}
+			result = nums.get(0)/nums.get(1);
+			break;
+		case "multiplied":
+			//get and multiply variables
+			nums = parseForNums(string);
+			result = nums.get(0)*nums.get(1);
+			break;
+		default:
+			System.out.println("Invalid operation");
+		}
 
-		return 0;
+		return result;
+	}
+
+	private String parseForOperation(String str) {
+		String oper = "";
+
+		if (str.contains("multip")) {
+			oper = "multiplied";
+		}
+		if (str.contains("plus")) {
+			oper = "plus";
+		}
+		if (str.contains("divi")) {
+			oper = "divided";
+		}
+		if (str.contains("minus")) {
+			oper = "minus";
+		}
+		// return the operation only
+		return oper;
+	}
+	
+	private ArrayList<Integer> parseForNums(String s) {
+		String[] stringNumsArray = s.split("[a-zA-Z?: ]+");
+		ArrayList<Integer> intArray = new ArrayList<Integer>();
+		
+		for (String stringNum : stringNumsArray) {
+			if (stringNum.matches("[-0-9]+")) {
+				intArray.add(Integer.parseInt(stringNum));
+			}
+		}
+
+		return intArray;
 	}
 
 }
